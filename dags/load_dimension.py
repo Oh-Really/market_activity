@@ -28,11 +28,12 @@ class DataFetchOperator(BaseOperator):
         content = self.get(url, params, headers)
         #TODO replace with StringIO
         df = pd.read_json(content)
+        print(df)
         return df
         
 
     def execute(self, context):
         self.log.info("Fetching data from API endpoint")
-        self.get_df(DataFetchOperator.url, 
+        return self.get_df(DataFetchOperator.url, 
                     params=DataFetchOperator.paramaters, 
                     headers=DataFetchOperator.headers)
