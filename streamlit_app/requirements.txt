@@ -1,0 +1,6 @@
+streamlit
+pandas
+numpy
+requests
+libpq-dev #requirement for psycopg2
+psycopg2

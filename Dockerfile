@@ -7,5 +7,4 @@ RUN pip install markupsafe==2.0.1 \
 	&& pip install apache-airflow-providers-microsoft-mssql[odbc] \
 	&& pip install apache-airflow-providers-microsoft-azure \
 	&& pip install gitpython \
-    && pip install pandas \
-    && pip install streamlit
+    && pip install pandas
