@@ -3,4 +3,5 @@ pandas
 numpy
 requests
 libpq-dev #requirement for psycopg2
-psycopg2
+psycopg2-binary
+matplotlib

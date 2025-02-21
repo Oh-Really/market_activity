@@ -25,25 +25,35 @@ default_args = {
 def trade_project():
     start_operator = DummyOperator(task_id='Begin_execution')
 
-    fetch_api_data_df = DataFetchOperator(task_id='analytics_api_call')
+    fetch_instrument_data_df = DataFetchOperator(task_id='instruments_api_call', endpoint='instruments')
+
+    fetch_trades_data_df = DataFetchOperator(task_id='trades_api_call', endpoint='trades')
 
     create_postgres_table = CreateTables(task_id='create_table', conn_id='my_postgres')
 
     @task()
-    def load_df_to_postgres(df: pd.DataFrame):
+    def load_df_to_postgres(df_list: list[pd.DataFrame]):
         postgres = PostgresHook(postgres_conn_id='my_postgres')
         conn_str = postgres.get_uri()
         engine = create_engine(conn_str)
-        df.to_sql('trades', engine, if_exists='replace')
+        for idx, df in enumerate(df_list):
+            if idx == 0:
+                df.to_sql('instruments', engine, if_exists='replace', index=False)
+            else:
+                df.to_sql('trades', engine, if_exists='replace', index=False)
 
-    # Next step: Read data from db back into df
-    # Include Streamlit web url for docker compose section
+    #TODO create task to run app.py in streamlit folder   
+    
+    
+    
+    #TODO group tasks using @task_group
     
 
     
     # Define dependencies
-    start_operator >> fetch_api_data_df
-    fetch_api_data_df >> create_postgres_table
-    create_postgres_table >> load_df_to_postgres(fetch_api_data_df.output)
+    start_operator >> fetch_instrument_data_df
+    fetch_instrument_data_df >> fetch_trades_data_df
+    fetch_trades_data_df >> create_postgres_table
+    create_postgres_table >> load_df_to_postgres([fetch_instrument_data_df.output, fetch_trades_data_df.output])
 
 fetch_data_dag = trade_project()
